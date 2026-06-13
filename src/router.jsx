@@ -5,8 +5,9 @@ import Layout from './components/layout/Layout'
 import Auth from './pages/Auth/AuthPage'
 import LandingPage from './pages/LandingPage/LandingPage'
 import HomePage from "./pages/Home/HomePage";
+import PropertyDetailPage from "./pages/PropertyDetail/PropertyDetailPage";
+
 /*
-import PropertyDetail from './pages/PropertyDetail/PropertyDetail'
 import Profile from './pages/Profile/Profile'
 import Wallet from './pages/Wallet/Wallet'
 import Analytics from './pages/Analytics/Analytics'
@@ -45,7 +46,7 @@ export default function Router() {
 
                 <Route element={<Layout />}>
                     <Route path="/properties" element={<Placeholder name="Listings" />} />
-                    <Route path="/properties/:id" element={<Placeholder name="PropertyDetail" />} />
+                    <Route path="/property/:id" element={<PropertyDetailPage />} />
                     <Route path="/" element={<LandingPage />} />
                     <Route path="/home" element={<HomePage />} />
 

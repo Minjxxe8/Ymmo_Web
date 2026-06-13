@@ -13,7 +13,7 @@ const formatPriceShort = (v) => v >= 1000000 ? `${(v / 1000000).toFixed(1)}M€`
 
 function PropertyCard({ property, isFav, onToggleFav, user }) {
     return (
-        <div className="bg-white group">
+        <div className="bg-white group h-full">
             <div className="relative overflow-hidden" style={{ aspectRatio: '16/10', backgroundColor: '#E8E4DC' }}>
                 <div className="w-full h-full group-hover:scale-105 transition-transform duration-500" style={{ backgroundColor: '#D4CFC7' }} />
                 {property.status === 'sold' && (
@@ -21,8 +21,12 @@ function PropertyCard({ property, isFav, onToggleFav, user }) {
                 )}
                 {user && (
                     <button
-                        onClick={(e) => { e.preventDefault(); onToggleFav(property.id) }}
-                        className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center bg-white/90 hover:bg-white transition-colors"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation(); // Empêche le clic du bouton de déclencher le Link de la carte
+                            onToggleFav(property.id);
+                        }}
+                        className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center bg-white/90 hover:bg-white transition-colors z-10"
                     >
                         <span style={{ color: isFav ? '#C9A84C' : '#C5C6CE' }}>{isFav ? '♥' : '♡'}</span>
                     </button>
@@ -32,7 +36,7 @@ function PropertyCard({ property, isFav, onToggleFav, user }) {
                 <div className="flex justify-between items-start mb-2">
                     <div>
                         <p className="text-xs tracking-widest uppercase mb-1" style={{ color: '#44474D' }}>{property.type} · {property.city}</p>
-                        <h3 className="text-lg italic" style={{ fontFamily: "'Cormorant Garamond', serif", color: '#0D1F3C' }}>{property.title}</h3>
+                        <h3 className="text-lg italic group-hover:text-yellow-600 transition-colors" style={{ fontFamily: "'Cormorant Garamond', serif", color: '#0D1F3C' }}>{property.title}</h3>
                     </div>
                     <span className="text-base font-semibold whitespace-nowrap ml-4" style={{ color: '#C9A84C' }}>{formatPrice(property.price)}</span>
                 </div>
@@ -60,6 +64,7 @@ function PropertyCard({ property, isFav, onToggleFav, user }) {
 
 export default function HomePage() {
     const { user } = useAuth()
+    // navigate est toujours importé et défini au cas où tu en aurais besoin ailleurs
     const navigate = useNavigate()
     const [searchParams] = useSearchParams()
 
@@ -136,7 +141,7 @@ export default function HomePage() {
                                 value={filters.city}
                                 onChange={(e) => setFilters((f) => ({ ...f, city: e.target.value }))}
                                 placeholder="Toutes les villes"
-                                className="border border-gray-200 px-3 py-2 text-sm outline-none focus:border-gray-400 transition-colors w-48"
+                                className="border border-gray-200 px-3 py-2 text-sm outline-none focus:border-gray-400 transition-colors w-48 bg-white"
                             />
                         </div>
                         <div className="flex flex-col gap-1">
@@ -146,7 +151,7 @@ export default function HomePage() {
                             <input type="range" min={100000} max={10000000} step={50000}
                                    value={filters.maxPrice}
                                    onChange={(e) => setFilters((f) => ({ ...f, maxPrice: Number(e.target.value) }))}
-                                   className="w-48 accent-yellow-600" />
+                                   className="w-48 accent-[#C9A84C]" />
                         </div>
                     </div>
                 </div>
@@ -156,7 +161,7 @@ export default function HomePage() {
                 <div className="max-w-7xl mx-auto px-8 lg:px-16">
                     {loading ? (
                         <div className="flex justify-center py-24">
-                            <div className="w-8 h-8 border-2 border-gray-200 border-t-yellow-600 rounded-full animate-spin" />
+                            <div className="w-8 h-8 border-2 border-gray-200 border-t-[#C9A84C] rounded-full animate-spin" />
                         </div>
                     ) : properties.length === 0 ? (
                         <div className="text-center py-24">
@@ -170,13 +175,19 @@ export default function HomePage() {
                             </p>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                                 {properties.map((p) => (
-                                    <PropertyCard
+                                    /* ---> MODIFICATION ICI : On wrap avec un composant Link <--- */
+                                    <Link
+                                        to={`/property/${p.id}`}
                                         key={p.id}
-                                        property={p}
-                                        isFav={favorites.includes(p.id)}
-                                        onToggleFav={handleToggleFav}
-                                        user={user}
-                                    />
+                                        className="block transition-transform duration-300 hover:-translate-y-1"
+                                    >
+                                        <PropertyCard
+                                            property={p}
+                                            isFav={favorites.includes(p.id)}
+                                            onToggleFav={handleToggleFav}
+                                            user={user}
+                                        />
+                                    </Link>
                                 ))}
                             </div>
                         </>
