@@ -7,6 +7,7 @@ import LandingPage from './pages/LandingPage/LandingPage'
 import HomePage from "./pages/Home/HomePage";
 import PropertyDetailPage from "./pages/PropertyDetail/PropertyDetailPage";
 import WalletPage from "./pages/Wallet/WalletPage";
+import ProfilePage from "./pages/Profile/ProfilePage.jsx";
 
 /*
 import Profile from './pages/Profile/Profile'
@@ -51,7 +52,7 @@ export default function Router() {
                     <Route path="/home" element={<HomePage />} />
 
                     <Route element={<PrivateRoute />}>
-                        <Route path="/profile" element={<Placeholder name="Profile" />} />
+                        <Route path="/profile" element={<ProfilePage/>} />
                         <Route path="/wallet" element={<WalletPage />} />
                     </Route>
 
