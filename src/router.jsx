@@ -8,15 +8,12 @@ import HomePage from "./pages/Home/HomePage";
 import PropertyDetailPage from "./pages/PropertyDetail/PropertyDetailPage";
 import WalletPage from "./pages/Wallet/WalletPage";
 import ProfilePage from "./pages/Profile/ProfilePage.jsx";
+import AdminPage from "./pages/Admin/AdminPage";
+import AnalyticsPage from "./pages/Analytics/AnalycticsPage.jsx";
 
-/*
-import Profile from './pages/Profile/Profile'
-import Analytics from './pages/Analytics/Analytics'
-import Admin from './pages/Admin/Admin'*/
-
-const Placeholder = ({ name }) => (
+/*const Placeholder = ({ name }) => (
     <div style={{ padding: '2rem', color: '#0D1F3C' }}>{name} — à venir</div>
-)
+)*/
 
 function PrivateRoute() {
     const { token, loading } = useAuth()
@@ -46,7 +43,7 @@ export default function Router() {
                 </Route>
 
                 <Route element={<Layout />}>
-                    <Route path="/properties" element={<Placeholder name="Listings" />} />
+                    <Route path="/properties" element={<HomePage/>} />
                     <Route path="/property/:id" element={<PropertyDetailPage />} />
                     <Route path="/" element={<LandingPage />} />
                     <Route path="/home" element={<HomePage />} />
@@ -57,8 +54,8 @@ export default function Router() {
                     </Route>
 
                     <Route element={<AdminRoute />}>
-                        <Route path="/admin" element={<Placeholder name="Admin" />} />
-                        <Route path="/analytics" element={<Placeholder name="Analytics" />} />
+                        <Route path="/admin" element={<AdminPage/>} />
+                        <Route path="/analytics" element={<AnalyticsPage />} />
                     </Route>
 
                     <Route path="*" element={<Navigate to="/" replace />} />
