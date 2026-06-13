@@ -1,1 +1,1 @@
-export const mockFavorites = ['1', '5']
+export const mockFavorites = ['1', '5', "4"]

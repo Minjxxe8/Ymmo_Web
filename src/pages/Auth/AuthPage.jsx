@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { login as loginApi, register as registerApi } from '../../api/auth.api'
 
-export default function Auth() {
+export default function AuthPage() {
     const { login } = useAuth()
     const navigate = useNavigate()
 
@@ -17,6 +17,16 @@ export default function Auth() {
         email: '',
         password: '',
     })
+
+    const fillMock = (userIndex) => {
+        const users = [
+            { email: 'lena@heritage.com', password: 'password' },
+            { email: 'noah@heritage.com', password: 'password' },
+            { email: 'emma@heritage.com', password: 'password' },
+        ]
+        setForm((f) => ({ ...f, ...users[userIndex] }))
+        setError(null)
+    }
 
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value })
@@ -35,13 +45,15 @@ export default function Auth() {
                 const res = await registerApi(form)
                 login(res.user, res.token)
             }
-            navigate('/')
+            navigate('/home')
         } catch (err) {
             setError(err?.message ?? 'Identifiants incorrects.')
         } finally {
             setLoading(false)
         }
     }
+
+    const isMock = import.meta.env.VITE_MOCK === 'true'
 
     return (
         <div className="min-h-screen flex" style={{ backgroundColor: '#FCF9F4', fontFamily: "'Space Grotesk', sans-serif" }}>
@@ -50,7 +62,6 @@ export default function Auth() {
                 <Link to="/" className="flex items-center gap-2 text-white text-lg tracking-widest uppercase font-semibold">
                     <span>🏛</span> Ymmo
                 </Link>
-
                 <div>
                     <h2 className="text-5xl xl:text-6xl italic leading-tight mb-6" style={{ fontFamily: "'Cormorant Garamond', 'Liberation Serif', serif", color: '#FCF9F4' }}>
                         L'Excellence<br />Immobilière<br />à votre service.
@@ -59,11 +70,10 @@ export default function Auth() {
                         Accédez aux meilleures opportunités immobilières, analysées par notre intelligence artificielle.
                     </p>
                 </div>
-
                 <div className="flex gap-8">
                     <div className="flex flex-col gap-1">
-                        <span className="text-2xl font-semibold" style={{ color: '#C9A84C' }}>+2 400</span>
-                        <span className="text-xs tracking-widest uppercase" style={{ color: '#C5C6CE' }}>Biens disponibles</span>
+                        <span className="text-2xl font-semibold" style={{ color: '#C9A84C' }}>+4 200</span>
+                        <span className="text-xs tracking-widest uppercase" style={{ color: '#C5C6CE' }}>Biens vendus</span>
                     </div>
                     <div className="flex flex-col gap-1">
                         <span className="text-2xl font-semibold" style={{ color: '#C9A84C' }}>12</span>
@@ -77,7 +87,6 @@ export default function Auth() {
             </div>
 
             <div className="flex-1 lg:max-w-lg flex flex-col justify-between p-8 lg:p-16">
-
                 <div className="lg:hidden flex justify-center mb-8">
                     <Link to="/" className="flex items-center gap-2 text-lg tracking-widest uppercase font-semibold" style={{ color: '#0D1F3C' }}>
                         <span>🏛</span> Ymmo
@@ -85,7 +94,6 @@ export default function Auth() {
                 </div>
 
                 <div className="flex-1 flex flex-col justify-center max-w-sm mx-auto w-full">
-
                     <div className="mb-10">
                         <h1 className="text-4xl italic mb-3 leading-snug" style={{ fontFamily: "'Cormorant Garamond', 'Liberation Serif', serif", color: '#0D1F3C' }}>
                             {mode === 'login' ? 'Bienvenue dans votre\nEspace Héritage' : 'Créez votre\nEspace Héritage'}
@@ -95,96 +103,70 @@ export default function Auth() {
                         </p>
                     </div>
 
-                    <div className="bg-white p-8 shadow-sm">
+                    {isMock && mode === 'login' && (
+                        <div className="mb-5 p-3 border border-dashed border-amber-300 bg-amber-50 rounded">
+                            <p className="text-xs font-medium mb-2" style={{ color: '#C9A84C' }}>Mode mock — connexion rapide</p>
+                            <div className="flex gap-2 flex-wrap">
+                                {[['Admin', 0], ['Agent', 1], ['Client', 2]].map(([label, i]) => (
+                                    <button
+                                        key={label}
+                                        onClick={() => fillMock(i)}
+                                        className="text-xs px-3 py-1 border border-amber-300 hover:bg-amber-100 transition-colors"
+                                        style={{ color: '#0D1F3C' }}
+                                    >
+                                        {label}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    )}
 
-                        {error && (
-                            <p className="text-xs text-red-500 mb-4">{error}</p>
-                        )}
+                    <div className="bg-white p-8 shadow-sm">
+                        {error && <p className="text-xs text-red-500 mb-4">{error}</p>}
 
                         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-
                             {mode === 'register' && (
                                 <div className="flex gap-3">
                                     <div className="flex flex-col gap-1 flex-1">
                                         <label className="text-xs tracking-widest uppercase" style={{ color: '#44474D' }}>Prénom</label>
-                                        <input
-                                            name="firstName"
-                                            value={form.firstName}
-                                            onChange={handleChange}
-                                            placeholder="Jean"
-                                            required
-                                            className="border border-gray-200 px-3 py-2.5 text-sm outline-none focus:border-gray-400 transition-colors w-full"
-                                            style={{ color: '#0D1F3C' }}
-                                        />
+                                        <input name="firstName" value={form.firstName} onChange={handleChange} placeholder="Jean" required
+                                               className="border border-gray-200 px-3 py-2.5 text-sm outline-none focus:border-gray-400 transition-colors w-full" style={{ color: '#0D1F3C' }} />
                                     </div>
                                     <div className="flex flex-col gap-1 flex-1">
                                         <label className="text-xs tracking-widest uppercase" style={{ color: '#44474D' }}>Nom</label>
-                                        <input
-                                            name="lastName"
-                                            value={form.lastName}
-                                            onChange={handleChange}
-                                            placeholder="Dupont"
-                                            required
-                                            className="border border-gray-200 px-3 py-2.5 text-sm outline-none focus:border-gray-400 transition-colors w-full"
-                                            style={{ color: '#0D1F3C' }}
-                                        />
+                                        <input name="lastName" value={form.lastName} onChange={handleChange} placeholder="Dupont" required
+                                               className="border border-gray-200 px-3 py-2.5 text-sm outline-none focus:border-gray-400 transition-colors w-full" style={{ color: '#0D1F3C' }} />
                                     </div>
                                 </div>
                             )}
 
                             <div className="flex flex-col gap-1">
                                 <label className="text-xs tracking-widest uppercase" style={{ color: '#44474D' }}>Identifiant email</label>
-                                <input
-                                    name="email"
-                                    type="email"
-                                    value={form.email}
-                                    onChange={handleChange}
-                                    placeholder="nom@heritage.com"
-                                    required
-                                    className="border border-gray-200 px-3 py-2.5 text-sm outline-none focus:border-gray-400 transition-colors"
-                                    style={{ color: '#0D1F3C' }}
-                                />
+                                <input name="email" type="email" value={form.email} onChange={handleChange} placeholder="nom@heritage.com" required
+                                       className="border border-gray-200 px-3 py-2.5 text-sm outline-none focus:border-gray-400 transition-colors" style={{ color: '#0D1F3C' }} />
                             </div>
 
                             <div className="flex flex-col gap-1">
                                 <label className="text-xs tracking-widest uppercase" style={{ color: '#44474D' }}>Clé d'accès</label>
-                                <input
-                                    name="password"
-                                    type="password"
-                                    value={form.password}
-                                    onChange={handleChange}
-                                    placeholder="••••••••"
-                                    required
-                                    className="border border-gray-200 px-3 py-2.5 text-sm outline-none focus:border-gray-400 transition-colors"
-                                    style={{ color: '#0D1F3C' }}
-                                />
+                                <input name="password" type="password" value={form.password} onChange={handleChange} placeholder="••••••••" required
+                                       className="border border-gray-200 px-3 py-2.5 text-sm outline-none focus:border-gray-400 transition-colors" style={{ color: '#0D1F3C' }} />
                             </div>
 
-                            <button
-                                type="submit"
-                                disabled={loading}
-                                className="w-full py-3 text-xs tracking-widest uppercase text-white transition-opacity hover:opacity-90 disabled:opacity-60 mt-1"
-                                style={{ backgroundColor: '#C9A84C' }}
-                            >
+                            <button type="submit" disabled={loading}
+                                    className="w-full py-3 text-xs tracking-widest uppercase text-white transition-opacity hover:opacity-90 disabled:opacity-60 mt-1"
+                                    style={{ backgroundColor: '#C9A84C' }}>
                                 {loading ? 'Chargement...' : mode === 'login' ? 'Se connecter →' : 'Créer mon compte →'}
                             </button>
-
                         </form>
 
                         <div className="flex justify-between items-center mt-4">
                             {mode === 'login' ? (
                                 <>
-                                    <button className="text-xs tracking-wide" style={{ color: '#009886' }}>
-                                        Mot de passe oublié ?
-                                    </button>
-                                    <button onClick={() => setMode('register')} className="text-xs tracking-widest uppercase" style={{ color: '#0D1F3C' }}>
-                                        Créer un compte
-                                    </button>
+                                    <button className="text-xs tracking-wide" style={{ color: '#009886' }}>Mot de passe oublié ?</button>
+                                    <button onClick={() => setMode('register')} className="text-xs tracking-widest uppercase" style={{ color: '#0D1F3C' }}>Créer un compte</button>
                                 </>
                             ) : (
-                                <button onClick={() => setMode('login')} className="text-xs tracking-widest uppercase ml-auto" style={{ color: '#0D1F3C' }}>
-                                    Déjà un compte ?
-                                </button>
+                                <button onClick={() => setMode('login')} className="text-xs tracking-widest uppercase ml-auto" style={{ color: '#0D1F3C' }}>Déjà un compte ?</button>
                             )}
                         </div>
 
@@ -203,7 +185,6 @@ export default function Auth() {
                             </svg>
                             Continuer avec Google
                         </button>
-
                     </div>
 
                     <div className="flex gap-8 mt-8">
@@ -216,7 +197,6 @@ export default function Auth() {
                             <span className="text-xs tracking-widest uppercase" style={{ color: '#44474D' }}>Analyses IA Actives</span>
                         </div>
                     </div>
-
                 </div>
 
                 <footer className="mt-8">
@@ -224,10 +204,9 @@ export default function Auth() {
                     <div className="flex gap-6">
                         <span className="text-xs tracking-widest uppercase cursor-pointer hover:underline" style={{ color: '#C5C6CE' }}>Mentions légales</span>
                         <span className="text-xs tracking-widest uppercase cursor-pointer hover:underline" style={{ color: '#C5C6CE' }}>Confidentialité</span>
-                        <span className="text-xs tracking-widets uppercase cursor-pointer hover:underline" style={{ color: '#C5C6CE' }}>Assistance</span>
+                        <span className="text-xs tracking-widest uppercase cursor-pointer hover:underline" style={{ color: '#C5C6CE' }}>Assistance</span>
                     </div>
                 </footer>
-
             </div>
         </div>
     )

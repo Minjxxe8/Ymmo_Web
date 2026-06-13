@@ -3,9 +3,9 @@ import { useAuth } from './context/AuthContext.jsx'
 import Layout from './components/layout/Layout'
 
 import Auth from './pages/Auth/AuthPage'
+import LandingPage from './pages/LandingPage/LandingPage'
+import HomePage from "./pages/Home/HomePage";
 /*
-import Home from './pages/Home/Home'
-import Listings from './pages/Listings/Listings'
 import PropertyDetail from './pages/PropertyDetail/PropertyDetail'
 import Profile from './pages/Profile/Profile'
 import Wallet from './pages/Wallet/Wallet'
@@ -44,9 +44,10 @@ export default function Router() {
                 </Route>
 
                 <Route element={<Layout />}>
-                    <Route path="/" element={<Placeholder name="Home" />} />
                     <Route path="/properties" element={<Placeholder name="Listings" />} />
                     <Route path="/properties/:id" element={<Placeholder name="PropertyDetail" />} />
+                    <Route path="/" element={<LandingPage />} />
+                    <Route path="/home" element={<HomePage />} />
 
                     <Route element={<PrivateRoute />}>
                         <Route path="/profile" element={<Placeholder name="Profile" />} />

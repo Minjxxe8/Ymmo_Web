@@ -8,26 +8,30 @@ import { mockPopular, mockTrends, mockZones, mockPredictions } from './data/anal
 const delay = (ms = 300) => new Promise((r) => setTimeout(r, ms))
 
 let favorites = [...mockFavorites]
+let currentUser = null
 
 export const mockAuth = {
     login: async ({ email, password }) => {
         await delay()
         const user = mockUsers.find((u) => u.email === email)
         if (!user || password !== 'password') throw { message: 'Identifiants incorrects.' }
+        currentUser = user
         return { user, token: mockToken }
     },
     register: async (data) => {
         await delay()
         const user = { id: String(mockUsers.length + 1), ...data, role: 'client', avatar: null }
+        currentUser = user
         return { user, token: mockToken }
     },
     getMe: async () => {
         await delay(100)
-        return mockUsers[0]
+        return currentUser ?? mockUsers[0]
     },
     updateMe: async (data) => {
         await delay()
-        return { ...mockUsers[0], ...data }
+        currentUser = { ...currentUser, ...data }
+        return currentUser
     },
 }
 
@@ -55,7 +59,7 @@ export const mockPropertiesHandlers = {
         await delay()
         return { ...mockProperties.find((p) => p.id === id), ...data }
     },
-    deleteProperty: async (id) => {
+    deleteProperty: async () => {
         await delay()
         return { success: true }
     },
@@ -94,10 +98,7 @@ export const mockFavoritesHandlers = {
 }
 
 export const mockWalletHandlers = {
-    getWallet: async () => {
-        await delay()
-        return mockWallet
-    },
+    getWallet: async () => { await delay(); return mockWallet },
     deposit: async ({ amount }) => {
         await delay()
         return { ...mockWallet, balance: mockWallet.balance + Number(amount) }
@@ -110,10 +111,7 @@ export const mockWalletHandlers = {
 }
 
 export const mockTransactionsHandlers = {
-    getTransactions: async () => {
-        await delay()
-        return mockTransactions
-    },
+    getTransactions: async () => { await delay(); return mockTransactions },
     getTransactionById: async (id) => {
         await delay()
         return mockTransactions.find((t) => t.id === id)

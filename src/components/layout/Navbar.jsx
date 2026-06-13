@@ -11,7 +11,7 @@ export default function Navbar() {
     }
 
     return (
-        <header className="fixed top-0 left-0 right-0 z-50 bg-neutral-950 border-b border-neutral-800">
+        <header className="fixed top-0 left-0 right-0 z-50 bg-[#0D1F3C] border-b border-neutral-800">
             <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
 
                 <Link to="/" className="text-white font-semibold text-xl tracking-widest uppercase">
