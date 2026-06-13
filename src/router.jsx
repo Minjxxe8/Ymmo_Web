@@ -6,10 +6,10 @@ import Auth from './pages/Auth/AuthPage'
 import LandingPage from './pages/LandingPage/LandingPage'
 import HomePage from "./pages/Home/HomePage";
 import PropertyDetailPage from "./pages/PropertyDetail/PropertyDetailPage";
+import WalletPage from "./pages/Wallet/WalletPage";
 
 /*
 import Profile from './pages/Profile/Profile'
-import Wallet from './pages/Wallet/Wallet'
 import Analytics from './pages/Analytics/Analytics'
 import Admin from './pages/Admin/Admin'*/
 
@@ -52,7 +52,7 @@ export default function Router() {
 
                     <Route element={<PrivateRoute />}>
                         <Route path="/profile" element={<Placeholder name="Profile" />} />
-                        <Route path="/wallet" element={<Placeholder name="Wallet" />} />
+                        <Route path="/wallet" element={<WalletPage />} />
                     </Route>
 
                     <Route element={<AdminRoute />}>
