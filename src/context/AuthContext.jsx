@@ -1,41 +1,47 @@
-import { createContext, useContext, useState, useEffect } from 'react'
-import { getMe } from '../api/auth.api'
+import {createContext, useContext, useState, useEffect} from 'react'
+import {getMe} from '../api/auth.api'
 
 const AuthContext = createContext(null)
 
-export function AuthProvider({ children }) {
+export function AuthProvider({children}) {
     const [user, setUser] = useState(null)
-    const [token, setToken] = useState(localStorage.getItem('token'))
+    const [accessToken, setAccessToken] = useState(localStorage.getItem('accessToken'))
+    const [refreshToken, setRefreshToken] = useState(localStorage.getItem('refreshToken'))
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        if (!token) {
+        if (!refreshToken || !accessToken) {
             setLoading(false)
             return
         }
         getMe()
             .then(setUser)
             .catch(() => {
-                localStorage.removeItem('token')
-                setToken(null)
+                localStorage.removeItem('accessToken')
+                localStorage.removeItem('refreshToken')
+                setRefreshToken(null)
+                setAccessToken(null)
             })
             .finally(() => setLoading(false))
-    }, [token])
+    }, [refreshToken, accessToken])
 
-    const login = (userData, receivedToken) => {
-        localStorage.setItem('token', receivedToken)
-        setToken(receivedToken)
-        setUser(userData)
+    const login = (receivedAccessToken, receivedRefreshToken) => {
+        localStorage.setItem('accessToken', receivedAccessToken)
+        localStorage.setItem('refreshToken', receivedRefreshToken)
+        setRefreshToken(receivedRefreshToken)
+        setAccessToken(receivedAccessToken)
     }
 
     const logout = () => {
-        localStorage.removeItem('token')
-        setToken(null)
+        localStorage.removeItem('accessToken')
+        localStorage.removeItem('refreshToken')
+        setRefreshToken(null)
         setUser(null)
     }
 
     return (
-        <AuthContext.Provider value={{ user, token, loading, login, logout }}>
+        <AuthContext.Provider
+            value={{user, refreshToken: refreshToken, accessToken: accessToken, loading, login, logout}}>
             {children}
         </AuthContext.Provider>
     )

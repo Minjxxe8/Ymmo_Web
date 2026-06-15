@@ -1,5 +1,5 @@
-import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom'
-import { useAuth } from './context/AuthContext.jsx'
+import {BrowserRouter, Routes, Route, Navigate, Outlet} from 'react-router-dom'
+import {useAuth} from './context/AuthContext.jsx'
 import Layout from './components/layout/Layout'
 
 import Auth from './pages/Auth/AuthPage'
@@ -16,21 +16,21 @@ import AnalyticsPage from "./pages/Analytics/AnalycticsPage.jsx";
 )*/
 
 function PrivateRoute() {
-    const { token, loading } = useAuth()
+    const {refreshToken, accessToken, loading} = useAuth()
     if (loading) return null
-    return token ? <Outlet /> : <Navigate to="/auth" replace />
+    return refreshToken !== '' && accessToken !== '' ? <Outlet/> : <Navigate to="/auth" replace/>
 }
 
 function AdminRoute() {
-    const { user, loading } = useAuth()
+    const {user, loading} = useAuth()
     if (loading) return null
-    return user?.role === 'admin' || user?.role === 'agent' ? <Outlet /> : <Navigate to="/" replace />
+    return user?.role === 'admin' || user?.role === 'agent' ? <Outlet/> : <Navigate to="/" replace/>
 }
 
 function GuestRoute() {
-    const { token, loading } = useAuth()
+    const {refreshToken, accessToken, loading} = useAuth()
     if (loading) return null
-    return !token ? <Outlet /> : <Navigate to="/" replace />
+    return !refreshToken || !accessToken ? <Outlet/> : <Navigate to="/" replace/>
 }
 
 export default function Router() {
@@ -38,27 +38,27 @@ export default function Router() {
         <BrowserRouter>
             <Routes>
 
-                <Route element={<GuestRoute />}>
-                    <Route path="/auth" element={<Auth />} />
+                <Route element={<GuestRoute/>}>
+                    <Route path="/auth" element={<Auth/>}/>
                 </Route>
 
-                <Route element={<Layout />}>
-                    <Route path="/properties" element={<HomePage/>} />
-                    <Route path="/property/:id" element={<PropertyDetailPage />} />
-                    <Route path="/" element={<LandingPage />} />
-                    <Route path="/home" element={<HomePage />} />
+                <Route element={<Layout/>}>
+                    <Route path="/properties" element={<HomePage/>}/>
+                    <Route path="/property/:id" element={<PropertyDetailPage/>}/>
+                    <Route path="/" element={<LandingPage/>}/>
+                    <Route path="/home" element={<HomePage/>}/>
 
-                    <Route element={<PrivateRoute />}>
-                        <Route path="/profile" element={<ProfilePage/>} />
-                        <Route path="/wallet" element={<WalletPage />} />
+                    <Route element={<PrivateRoute/>}>
+                        <Route path="/profile" element={<ProfilePage/>}/>
+                        <Route path="/wallet" element={<WalletPage/>}/>
                     </Route>
 
-                    <Route element={<AdminRoute />}>
-                        <Route path="/admin" element={<AdminPage/>} />
-                        <Route path="/analytics" element={<AnalyticsPage />} />
+                    <Route element={<AdminRoute/>}>
+                        <Route path="/admin" element={<AdminPage/>}/>
+                        <Route path="/analytics" element={<AnalyticsPage/>}/>
                     </Route>
 
-                    <Route path="*" element={<Navigate to="/" replace />} />
+                    <Route path="*" element={<Navigate to="/" replace/>}/>
                 </Route>
 
             </Routes>
