@@ -20,7 +20,7 @@ const EMPTY_FORM = {
     bathrooms: '',
     type: '',
     city: '',
-    neighborhood: '',
+    area: '',
     address: '',
     diagnostic: 'C',
     ges: 'C',
@@ -43,7 +43,19 @@ function PropertyFormModal({initial, onClose, onSave}) {
 
     useEffect(() => {
         getPropertyTypes().then((types) => setTypes(types))
-    })
+        if (initial) {
+            setForm((f) => ({
+                ...f,
+                ...initial,
+                // support both initial.type as object or id
+                type: initial.type?.id ? String(initial.type.id) : (initial.type ? String(initial.type) : f.type),
+                // normalize surface/rooms keys if backend uses surfaceArea/roomCount
+                surface: initial.surfaceArea ?? initial.surface ?? f.surface,
+                rooms: initial.roomCount ?? initial.rooms ?? f.rooms,
+            }))
+        }
+    }, [initial])
+
 
     const set = (k, v) => setForm((f) => ({...f, [k]: v}))
 
@@ -70,7 +82,7 @@ function PropertyFormModal({initial, onClose, onSave}) {
         label: 'Pièces',
         type: 'number'
     }, {key: 'country', label: 'Pays', type: 'text'}, {key: 'city', label: 'Ville', type: 'text'}, {
-        key: 'neighborhood',
+        key: 'area',
         label: 'Quartier',
         type: 'text'
     }, {key: 'address', label: 'Adresse', type: 'text', span: 2},]
@@ -99,7 +111,7 @@ function PropertyFormModal({initial, onClose, onSave}) {
                                    style={{color: '#0D1F3C'}}/>
                         </div>))}
 
-                    {[['type', 'Type', types.map((t) => t.name)], ['diagnostic', 'DPE', DPE_OPTIONS]].map(([key, label, opts]) => (
+                    {[['diagnostic', 'DPE', DPE_OPTIONS]].map(([key, label, opts]) => (
                         <div key={key} className="flex flex-col gap-1">
                             <label className="text-xs tracking-widest uppercase"
                                    style={{color: '#44474D'}}>{label}</label>
@@ -109,6 +121,16 @@ function PropertyFormModal({initial, onClose, onSave}) {
                                 {opts.map((o) => <option key={o}>{o}</option>)}
                             </select>
                         </div>))}
+
+                    <div className="flex flex-col gap-1">
+                        <label className="text-xs tracking-widest uppercase" style={{color: '#44474D'}}>Type</label>
+                        <select value={form.type} onChange={(e) => set('type', e.target.value)}
+                                className="border border-gray-200 px-3 py-2.5 text-sm outline-none focus:border-gray-400 bg-white"
+                                style={{color: '#0D1F3C'}}>
+                            <option value="">Choisir un type</option>
+                            {types.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
+                        </select>
+                    </div>
 
                     <div className="flex flex-col gap-1 col-span-2">
                         <label className="text-xs tracking-widest uppercase"
@@ -160,37 +182,34 @@ export default function AdminPage() {
                 setTransactions(txs)
             })
             .finally(() => setLoading(false))
-        getPropertyTypes().then((types) => setTypes(types.map((t) => t.name)))
+        getPropertyTypes().then((types) => setTypes(types))
 
         getUsers().then((users) => setUsers(users))
     }, [user])
 
     const handleCreate = async (form) => {
-        console.log({
+        let typeId = Number(form.type)
+        if (isNaN(typeId)) {
+            const selectedType = types && types.find((t) => t.name === form.type)
+            typeId = selectedType ? selectedType.id : null
+        }
+
+        const payload = {
             name: form.name,
-            price: form.price,
-            types: types.map((t) => ({name: t}).id),
-            surfaceArea: form.surface,
-            roomCount: form.rooms,
-            diagnostic: form.dpe,
+            typeId: typeId,
+            price: Number(form.price),
+            surfaceArea: Number(form.surface),
+            roomCount: Number(form.rooms),
+            diagnostic: form.diagnostic,
             country: form.country,
             city: form.city,
-            area: form.neighborhood,
+            area: form.area,
             onSale: true
-        })
-        const created = await createProperty({
-                name: form.name,
-                price: form.price,
-                types: types.map((t) => ({name: t}).id),
-                surfaceArea: form.surface,
-                roomCount: form.rooms,
-                diagnostic: form.diagnostic,
-                country: form.country,
-                city: form.city,
-                area: form.neighborhood,
-                onSale: true
-            }
-        )
+        }
+
+        console.log('Creating property payload:', payload)
+
+        const created = await createProperty(payload)
         setProperties((p) => [...p, created])
     }
 
@@ -424,12 +443,13 @@ export default function AdminPage() {
                         Répartition par type
                     </h2>
                     <div className="flex flex-col gap-3">
-                        {types.map((type) => {
-                            const count = properties.filter((p) => p.type.name === type).length
+                        {types.map((t) => {
+                            const typeName = typeof t === 'string' ? t : t.name
+                            const count = properties.filter((p) => (p.type?.name ?? p.type) === typeName).length
                             const pct = properties.length > 0 ? Math.round((count / properties.length) * 100) : 0
-                            return (<div key={type} className="flex items-center gap-4">
+                            return (<div key={typeName} className="flex items-center gap-4">
                                 <p className="text-xs tracking-widest uppercase w-24 shrink-0"
-                                   style={{color: '#44474D'}}>{type}</p>
+                                   style={{color: '#44474D'}}>{typeName}</p>
                                 <div className="flex-1 h-2 bg-gray-100">
                                     <div className="h-full transition-all duration-500"
                                          style={{width: `${pct}%`, backgroundColor: '#C9A84C'}}/>
