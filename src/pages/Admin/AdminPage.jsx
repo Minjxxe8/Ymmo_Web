@@ -47,9 +47,7 @@ function PropertyFormModal({initial, onClose, onSave}) {
             setForm((f) => ({
                 ...f,
                 ...initial,
-                // support both initial.type as object or id
                 type: initial.type?.id ? String(initial.type.id) : (initial.type ? String(initial.type) : f.type),
-                // normalize surface/rooms keys if backend uses surfaceArea/roomCount
                 surface: initial.surfaceArea ?? initial.surface ?? f.surface,
                 rooms: initial.roomCount ?? initial.rooms ?? f.rooms,
             }))
