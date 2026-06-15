@@ -162,7 +162,7 @@ export default function HomePage() {
                     {filters.city ? `Biens à ${filters.city}` : 'Toutes les annonces'}
                 </h1>
 
-                <div className="flex flex-wrap gap-3 mb-6">
+                {/*<div className="flex flex-wrap gap-3 mb-6">
                     {types.map((t) => (<button key={t.id}
                                                onClick={() => setFilters((f) => ({...f, type: t.name}))}
                                                className="text-xs tracking-widest uppercase px-4 py-2 border transition-colors"
@@ -173,7 +173,7 @@ export default function HomePage() {
                                                }}>
                         {t.name}
                     </button>))}
-                </div>
+                </div>*/}
 
                 <div className="flex flex-wrap gap-6 items-end">
                     <div className="flex flex-col gap-1">
