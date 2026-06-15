@@ -2,7 +2,8 @@ import {useState, useEffect} from 'react'
 import {useNavigate} from 'react-router-dom'
 import {useAuth} from '../../context/AuthContext'
 import {
-    getProperties, createProperty, updateProperty, deleteProperty, updatePropertyStatus, getPropertyTypes
+    getProperties, createProperty, updateProperty, deleteProperty, updatePropertyStatus, getPropertyTypes,
+    addPropertyImage
 } from '../../api/properties.api'
 import {getTransactions} from '../../api/transactions.api'
 import {deleteUser, getUsers, toggleRoleUser} from "../../api/user.api.js";
@@ -13,7 +14,6 @@ const formatDate = (d) => new Date(d).toLocaleDateString('fr-FR')
 
 const EMPTY_FORM = {
     title: '',
-    description: '',
     price: '',
     surface: '',
     rooms: '',
@@ -21,7 +21,6 @@ const EMPTY_FORM = {
     type: '',
     city: '',
     area: '',
-    address: '',
     diagnostic: 'C',
     ges: 'C',
     status: 'available',
@@ -83,7 +82,7 @@ function PropertyFormModal({initial, onClose, onSave}) {
         key: 'area',
         label: 'Quartier',
         type: 'text'
-    }, {key: 'address', label: 'Adresse', type: 'text', span: 2},]
+    },]
 
     return (<div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto"
                  style={{backgroundColor: 'rgba(13,31,60,0.7)'}}>
@@ -132,11 +131,13 @@ function PropertyFormModal({initial, onClose, onSave}) {
 
                     <div className="flex flex-col gap-1 col-span-2">
                         <label className="text-xs tracking-widest uppercase"
-                               style={{color: '#44474D'}}>Description</label>
-                        <textarea rows={3} value={form.description}
-                                  onChange={(e) => set('description', e.target.value)}
-                                  className="border border-gray-200 px-3 py-2 text-sm outline-none focus:border-gray-400 resize-none"
-                                  style={{color: '#0D1F3C'}}/>
+                               style={{color: '#44474D'}}>Photos</label>
+                        <input
+                            type={"file"}
+                            multiple
+                            className={"h-full w-full border border-gray-400"}
+                            onChange={(e) => set('photos', e.target.files)}
+                            accept="image/png, image/jpeg, image/jpg"/>
                     </div>
                 </div>
 
@@ -208,11 +209,19 @@ export default function AdminPage() {
         console.log('Creating property payload:', payload)
 
         const created = await createProperty(payload)
+        if (form.photos && form.photos.length > 0) {
+            await addPropertyImage(created.id, form.photos)
+        }
         setProperties((p) => [...p, created])
     }
 
     const handleUpdate = async (form) => {
         const updated = await updateProperty(editTarget.id, form)
+        console.log(updated)
+        if (form.photos && form.photos.length > 0) {
+            await addPropertyImag
+            e(updated.id, form.photos)
+        }
         setProperties((p) => p.map((x) => x.id === editTarget.id ? {...x, ...updated} : x))
         setEditTarget(null)
     }
@@ -297,7 +306,7 @@ export default function AdminPage() {
                             <td className="px-5 py-4 text-sm" style={{color: '#44474D'}}>{p.city}</td>
                             <td className="px-5 py-4 text-sm font-semibold"
                                 style={{color: '#C9A84C'}}>{formatPrice(p.price)}</td>
-                            <td className="px-5 py-4 text-sm" style={{color: '#44474D'}}>{p.surface} m²</td>
+                            <td className="px-5 py-4 text-sm" style={{color: '#44474D'}}>{p.surfaceArea} m²</td>
                             <td className="px-5 py-4">
                         <span className="text-xs font-bold text-white px-2 py-0.5"
                               style={{
