@@ -245,11 +245,6 @@ export default function PropertyDetailPage() {
                                 <p className="text-sm"
                                    style={{color: '#44474D'}}>{property.area}, {property.city}, {property.country}</p>
                             </div>
-                            <div className="w-full flex items-center justify-center border border-gray-200"
-                                 style={{height: '220px', backgroundColor: '#EDE9E0'}}>
-                                <p className="text-xs tracking-widest uppercase" style={{color: '#C5C6CE'}}>Carte —
-                                    disponible avec le backend</p>
-                            </div>
                         </div>
 
                         {property.diagnostic && (
