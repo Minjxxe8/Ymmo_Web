@@ -20,6 +20,8 @@ client.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+      //TODO: add /refresh call
       window.location.href = "/auth";
     }
     return Promise.reject(error.response?.data ?? error);
